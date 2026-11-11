@@ -1,7 +1,7 @@
 change_type: bug_fix
 component: exporter/opensearch
 note: Preserve retryable bulk failures and provide an opt-in Studio mapping for direct OpenSearch ingestion without Data Prepper.
-issues: []
+issues: [132]
 subtext: |
   Bulk request buffers remain valid when a server responds before reading the complete payload.
   Studio mode keeps typed OTLP fields and stable document IDs for idempotent retries.
