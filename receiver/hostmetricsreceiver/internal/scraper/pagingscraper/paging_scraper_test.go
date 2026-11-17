@@ -77,10 +77,15 @@ func TestScrape(t *testing.T) {
 			require.NoError(t, err)
 			metrics := md.ResourceMetrics().At(0).ScopeMetrics().At(0).Metrics()
 
-			expectedMetrics := 4
-			assert.Equal(t, expectedMetrics, md.MetricCount())
+			pageFiles, err := getPageFileStats()
+			require.NoError(t, err)
+			expectedMetrics := 2
+			if len(pageFiles) > 0 {
+				expectedMetrics += 2
+			}
+			require.Equal(t, expectedMetrics, md.MetricCount())
 
-			var pagingUsageMetricIdx, pagingUtilizationMetricIdx, pagingOperationsMetricIdx, pagingFaultsMetricIdx int
+			pagingUsageMetricIdx, pagingUtilizationMetricIdx, pagingOperationsMetricIdx, pagingFaultsMetricIdx := -1, -1, -1, -1
 			for i := 0; i < metrics.Len(); i++ {
 				metric := metrics.At(i)
 				switch metric.Name() {
@@ -99,20 +104,27 @@ func TestScrape(t *testing.T) {
 
 			// This test historically ensured that some metrics had the same timestamp, keeping this legacy behavior.
 
+			require.NotEqual(t, -1, pagingFaultsMetricIdx)
+			require.NotEqual(t, -1, pagingOperationsMetricIdx)
 			assertPageFaultsMetricValid(t, metrics.At(pagingFaultsMetricIdx), test.expectedStartTime)
 
 			assertPagingOperationsMetricValid(t, []pmetric.Metric{metrics.At(pagingOperationsMetricIdx)},
 				test.expectedStartTime, false)
 
-			internal.AssertSameTimeStampForMetrics(t, metrics, pagingUsageMetricIdx, pagingUsageMetricIdx+2)
-
-			assertPagingUsageMetricValid(t, metrics.At(pagingUsageMetricIdx))
+			if len(pageFiles) > 0 {
+				require.NotEqual(t, -1, pagingUsageMetricIdx)
+				require.NotEqual(t, -1, pagingUtilizationMetricIdx)
+				internal.AssertSameTimeStampForMetrics(t, metrics, pagingUsageMetricIdx, pagingUsageMetricIdx+2)
+				assertPagingUsageMetricValid(t, metrics.At(pagingUsageMetricIdx))
+				assertPagingUtilizationMetricValid(t, metrics.At(pagingUtilizationMetricIdx))
+			} else {
+				assert.Equal(t, -1, pagingUsageMetricIdx)
+				assert.Equal(t, -1, pagingUtilizationMetricIdx)
+			}
 			if runtime.GOOS != "windows" {
 				// On Windows, page faults do not have the same timestamp as paging operations
 				internal.AssertSameTimeStampForMetrics(t, metrics, pagingFaultsMetricIdx, pagingFaultsMetricIdx+2)
 			}
-
-			assertPagingUtilizationMetricValid(t, metrics.At(pagingUtilizationMetricIdx))
 		})
 	}
 }

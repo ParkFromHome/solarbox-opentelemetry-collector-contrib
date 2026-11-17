@@ -8,9 +8,11 @@ import (
 	"errors"
 	"maps"
 	"runtime"
+	"slices"
 	"testing"
 	"time"
 
+	"github.com/shirou/gopsutil/v4/mem"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -149,7 +151,18 @@ func assertIncludesExpectedMetrics(t *testing.T, got pmetric.Metrics) {
 	}
 
 	// verify the expected list of metrics returned (os/arch dependent)
-	expectedMetrics := allMetrics
+	expectedMetrics := slices.Clone(allMetrics)
+	// Linux emits device usage only for configured swap devices. Runners may
+	// legitimately have none; faults and operations must still be collected.
+	if runtime.GOOS == "linux" {
+		swap, err := mem.SwapMemoryWithContext(t.Context())
+		require.NoError(t, err)
+		if swap.Total == 0 {
+			expectedMetrics = slices.DeleteFunc(expectedMetrics, func(name string) bool {
+				return name == "system.paging.usage"
+			})
+		}
+	}
 
 	expectedMetrics = append(expectedMetrics, systemSpecificMetrics[runtime.GOOS]...)
 	if nfsscraper.CanScrapeAll() {
