@@ -134,17 +134,27 @@ func TestReconnectIfUnhealthy(t *testing.T) {
 }
 
 func TestReconnectAuthenticationSurvivesCredentialClearing(t *testing.T) {
-	for _, auth := range []amqp.Authentication{
-		&amqp.PlainAuth{Username: "test-user", Password: "test-password"},
-		&amqp.AMQPlainAuth{Username: "test-user", Password: "test-password"},
+	for _, tt := range []struct {
+		auth amqp.Authentication
+		want amqp.Authentication
+	}{
+		{
+			auth: &amqp.PlainAuth{Username: "test-user", Password: "test-password"},
+			want: &amqp.PlainAuth{Username: "test-user", Password: "test-password"},
+		},
+		{
+			auth: &amqp.AMQPlainAuth{Username: "test-user", Password: "test-password"},
+			want: &amqp.AMQPlainAuth{Username: "test-user", Password: "test-password"},
+		},
 	} {
-		t.Run(auth.Mechanism(), func(t *testing.T) {
-			connection := &connectionHolder{config: amqp.Config{SASL: []amqp.Authentication{auth}}}
-			expected := auth.Response()
+		t.Run(tt.auth.Mechanism(), func(t *testing.T) {
+			connection := &connectionHolder{config: amqp.Config{SASL: []amqp.Authentication{tt.auth}}}
 			for range 2 {
 				config := connection.newDialConfig()
-				assert.NotSame(t, auth, config.SASL[0])
-				assert.Equal(t, expected, config.SASL[0].Response())
+				assert.NotSame(t, tt.auth, config.SASL[0])
+				// AMQPLAIN encodes a map, so wire field order is not stable.
+				// Compare credentials without depending on serialization order.
+				assert.Equal(t, tt.want, config.SASL[0])
 				// Match the SDK's successful-handshake credential clearing.
 				switch current := config.SASL[0].(type) {
 				case *amqp.PlainAuth:
@@ -152,7 +162,7 @@ func TestReconnectAuthenticationSurvivesCredentialClearing(t *testing.T) {
 				case *amqp.AMQPlainAuth:
 					current.Password = ""
 				}
-				assert.Equal(t, expected, auth.Response())
+				assert.Equal(t, tt.want, tt.auth)
 			}
 		})
 	}
