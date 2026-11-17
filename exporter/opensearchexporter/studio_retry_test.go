@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -33,7 +34,12 @@ func TestStudioExporterRetriesWholeBulkFailures(t *testing.T) {
 				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					if requests.Add(1) == 1 {
 						if status == 0 {
-							// Simulate a connection lost before any HTTP response.
+							// Consume the request before closing without a response so
+							// the client sees EOF, rather than a timing-dependent reset.
+							if _, err := io.Copy(io.Discard, r.Body); err != nil {
+								t.Error(err)
+								return
+							}
 							connection, _, err := w.(http.Hijacker).Hijack()
 							if err != nil {
 								t.Error(err)

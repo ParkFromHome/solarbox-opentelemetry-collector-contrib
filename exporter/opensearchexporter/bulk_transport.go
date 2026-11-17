@@ -21,8 +21,22 @@ func (t bulkTransport) RoundTrip(request *http.Request) (*http.Response, error) 
 	if request.Body == nil || request.Body == http.NoBody {
 		return t.base.RoundTrip(request)
 	}
-	body, err := io.ReadAll(request.Body)
-	closeErr := request.Body.Close()
+	// opensearch-go retries EOF even with DisableRetry set, but does not reset
+	// Body in that case. Use the request's replayable reader when available so
+	// that internal retry cannot send an exhausted body with the original length.
+	source := request.Body
+	if request.GetBody != nil {
+		if err := request.Body.Close(); err != nil {
+			return nil, err
+		}
+		var err error
+		source, err = request.GetBody()
+		if err != nil {
+			return nil, err
+		}
+	}
+	body, err := io.ReadAll(source)
+	closeErr := source.Close()
 	if err != nil {
 		return nil, err
 	}
