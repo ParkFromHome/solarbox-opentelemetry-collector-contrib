@@ -10,6 +10,7 @@ subtext: |
   message payloads rather than Avro schema decoding.
   Align Collector runtime modules at v1.59.0/v0.153.0 while retaining the v0.148
   metadata generator for existing component feature gates. Also patch Brotli,
-  RabbitMQ, PostgreSQL, Snowflake, and OpenTelemetry schema dependencies.
+  RabbitMQ, PostgreSQL, Snowflake, MongoDB, PKCS#12, cilium/ebpf, and
+  OpenTelemetry schema dependencies.
   Existing published Collector images are not changed by this source update.
 change_logs: [user]
