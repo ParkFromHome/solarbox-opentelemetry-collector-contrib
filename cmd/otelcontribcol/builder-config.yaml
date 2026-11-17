@@ -282,6 +282,8 @@ providers:
 # file before passing it to OCB, to ensure that local versions are used for all
 # Contrib modules.
 replaces:
+  # hamba/avro is archived; use the patched fork documented by its security advisory.
+  - github.com/hamba/avro/v2 => github.com/iskorotkov/avro/v2 v2.33.1
   # Upstream Collector components bring their own internal telemetry SDK/exporters.
   # Keep those patched even when they are not dependencies of our local exporter.
   - go.opentelemetry.io/contrib/bridges/otelzap => go.opentelemetry.io/contrib/bridges/otelzap v0.20.0

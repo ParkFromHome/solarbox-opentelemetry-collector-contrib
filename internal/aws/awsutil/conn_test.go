@@ -5,7 +5,9 @@ package awsutil
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -19,6 +21,34 @@ import (
 )
 
 type mockSTS struct{}
+
+func TestHTTPClientNegotiatesProtocols(t *testing.T) {
+	for _, http2 := range []bool{false, true} {
+		t.Run(fmt.Sprintf("http2=%t", http2), func(t *testing.T) {
+			server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}))
+			server.EnableHTTP2 = http2
+			server.StartTLS()
+			defer server.Close()
+			client, err := newHTTPClient(zap.NewNop(), 8, 30, true, "")
+			require.NoError(t, err)
+			transport, ok := client.Transport.(*http.Transport)
+			require.True(t, ok)
+			// Keep this local protocol test independent of cached environment proxies.
+			transport.Proxy = nil
+			t.Cleanup(client.CloseIdleConnections)
+			response, err := client.Get(server.URL)
+			require.NoError(t, err)
+			defer response.Body.Close()
+			if http2 {
+				assert.Equal(t, 2, response.ProtoMajor)
+			} else {
+				assert.Equal(t, 1, response.ProtoMajor)
+			}
+		})
+	}
+}
 
 func TestGetAWSConfig(t *testing.T) {
 	logger := zap.NewNop()

@@ -126,6 +126,8 @@ jobs:
     needs: [setup-environment]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Verify vulnerability finding classification
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s internal/buildscripts -p govulncheck_test.py
       - uses: ./.github/actions/setup-go-tools
         with:
           go-version: oldstable

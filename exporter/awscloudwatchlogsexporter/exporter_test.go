@@ -6,6 +6,7 @@ package awscloudwatchlogsexporter
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -415,6 +416,14 @@ func TestConsumeLogs(t *testing.T) {
 }
 
 func TestNewExporterWithoutRegionErr(t *testing.T) {
+	// This test must not inherit an SDK region from CI or a developer profile.
+	t.Setenv("AWS_REGION", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_PROFILE", "")
+	t.Setenv("AWS_CONFIG_FILE", filepath.Join(t.TempDir(), "config"))
+	t.Setenv("AWS_SHARED_CREDENTIALS_FILE", filepath.Join(t.TempDir(), "credentials"))
+	t.Setenv("AWS_EC2_METADATA_DISABLED", "true")
 	factory := NewFactory()
 	expCfg := factory.CreateDefaultConfig().(*Config)
 	expCfg.MaxRetries = 0

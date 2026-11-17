@@ -149,6 +149,14 @@ linters:
 
   # all available settings of specific linters
   settings:
+    modernize:
+      # Keep the existing style policy while patched dependencies require Go 1.26
+      # and newer x/tools. A repository-wide new(expr)/AsType/import-comment rewrite is
+      # independent of the dependency security update; other analyzers stay on.
+      disable:
+        - newexpr
+        - errorsastype
+        - importcomment
     depguard:
       rules:
         denied-deps:

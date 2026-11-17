@@ -5,5 +5,8 @@ issues: [132]
 subtext: |
   Update OpenTelemetry-Go, gRPC, Prometheus, compress, and golang.org/x networking,
   cryptography, and text modules to address vulnerabilities reported by CI.
+  Patch AWS EventStream and eBPF profiling dependencies. Replace archived hamba/avro
+  with its patched iskorotkov fork for Pulsar; Collector continues to use raw
+  message payloads rather than Avro schema decoding.
   Existing published Collector images are not changed by this source update.
 change_logs: [user]

@@ -265,7 +265,7 @@ lint: checklicense misspell
 
 .PHONY: govulncheck
 govulncheck:
-	$(GOVULNCHECK) ./...
+	python3 "$(SRC_ROOT)/internal/buildscripts/govulncheck.py" "$(GOVULNCHECK)" ./...
 
 .PHONY: modernize
 modernize:
