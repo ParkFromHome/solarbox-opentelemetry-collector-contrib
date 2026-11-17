@@ -6,6 +6,7 @@ package awsemfexporter
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"testing"
 
 	"github.com/aws/smithy-go"
@@ -328,6 +329,7 @@ func TestPushMetricsDataWithErr(t *testing.T) {
 }
 
 func TestNewExporterWithoutConfig(t *testing.T) {
+	clearAWSRegionSources(t)
 	factory := NewFactory()
 	expCfg := factory.CreateDefaultConfig().(*Config)
 	settings := exportertest.NewNopSettings(metadata.Type)
@@ -431,6 +433,7 @@ func TestWrapErrorIfBadRequest(t *testing.T) {
 // This test verifies that if func newEmfExporter() returns an error then newEmfExporter()
 // will do so.
 func TestNewEmfExporterWithoutConfig(t *testing.T) {
+	clearAWSRegionSources(t)
 	factory := NewFactory()
 	expCfg := factory.CreateDefaultConfig().(*Config)
 	settings := exportertest.NewNopSettings(metadata.Type)
@@ -440,4 +443,16 @@ func TestNewEmfExporterWithoutConfig(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, exp)
 	assert.Equal(t, expCfg.logger, settings.Logger)
+}
+
+// Missing-config tests must not inherit a region from an EC2 CI runner or profile.
+func clearAWSRegionSources(t *testing.T) {
+	t.Helper()
+	t.Setenv("AWS_REGION", "")
+	t.Setenv("AWS_DEFAULT_REGION", "")
+	t.Setenv("AWS_PROFILE", "")
+	t.Setenv("AWS_DEFAULT_PROFILE", "")
+	t.Setenv("AWS_CONFIG_FILE", filepath.Join(t.TempDir(), "config"))
+	t.Setenv("AWS_SHARED_CREDENTIALS_FILE", filepath.Join(t.TempDir(), "credentials"))
+	t.Setenv("AWS_EC2_METADATA_DISABLED", "true")
 }

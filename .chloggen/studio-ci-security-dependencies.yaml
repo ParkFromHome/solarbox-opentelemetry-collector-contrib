@@ -10,7 +10,11 @@ subtext: |
   message payloads rather than Avro schema decoding.
   Align Collector runtime modules at v1.59.0/v0.153.0 while retaining the v0.148
   metadata generator for existing component feature gates. Also patch Brotli,
-  RabbitMQ, PostgreSQL, Snowflake, MongoDB, PKCS#12, cilium/ebpf, and
-  OpenTelemetry schema dependencies.
+  RabbitMQ, PostgreSQL, Snowflake, MongoDB v1, PKCS#12, cilium/ebpf, and
+  OpenTelemetry schema and Docker test archive dependencies. Preserve RabbitMQ
+  reconnect credentials when the patched client clears handshake authentication.
+  Keep MongoDB v2.3.1 for existing MongoDB 4.0 support; the optional GSSAPI
+  vulnerability is inapplicable only when that implementation is absent from
+  the actual build dependency graph. GSSAPI builds still fail the security check.
   Existing published Collector images are not changed by this source update.
 change_logs: [user]

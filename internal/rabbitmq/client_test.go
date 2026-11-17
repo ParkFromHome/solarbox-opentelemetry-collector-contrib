@@ -133,6 +133,31 @@ func TestReconnectIfUnhealthy(t *testing.T) {
 	}
 }
 
+func TestReconnectAuthenticationSurvivesCredentialClearing(t *testing.T) {
+	for _, auth := range []amqp.Authentication{
+		&amqp.PlainAuth{Username: "test-user", Password: "test-password"},
+		&amqp.AMQPlainAuth{Username: "test-user", Password: "test-password"},
+	} {
+		t.Run(auth.Mechanism(), func(t *testing.T) {
+			connection := &connectionHolder{config: amqp.Config{SASL: []amqp.Authentication{auth}}}
+			expected := auth.Response()
+			for range 2 {
+				config := connection.newDialConfig()
+				assert.NotSame(t, auth, config.SASL[0])
+				assert.Equal(t, expected, config.SASL[0].Response())
+				// Match the SDK's successful-handshake credential clearing.
+				switch current := config.SASL[0].(type) {
+				case *amqp.PlainAuth:
+					current.Password = ""
+				case *amqp.AMQPlainAuth:
+					current.Password = ""
+				}
+				assert.Equal(t, expected, auth.Response())
+			}
+		})
+	}
+}
+
 func TestIsConnected(t *testing.T) {
 	logger := zap.NewNop()
 	connection := &connectionHolder{

@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"slices"
 	"sync"
 	"time"
 
@@ -131,7 +132,7 @@ func (c *connectionHolder) ReconnectIfUnhealthy() error {
 func (c *connectionHolder) connect() error {
 	c.logger.Debug("Connecting to rabbitmq")
 
-	connection, err := amqp.DialConfig(c.url, c.config)
+	connection, err := amqp.DialConfig(c.url, c.newDialConfig())
 	if connection != nil {
 		c.connection = connection
 	}
@@ -144,6 +145,24 @@ func (c *connectionHolder) connect() error {
 	c.connectionErrors = make(chan *amqp.Error, 1)
 	c.connection.NotifyClose(c.connectionErrors)
 	return nil
+}
+
+func (c *connectionHolder) newDialConfig() amqp.Config {
+	config := c.config
+	config.SASL = slices.Clone(c.config.SASL)
+	// amqp091-go clears passwords after a successful handshake. Each connection
+	// owns its authentication objects so reconnects retain the configured secret.
+	for i, auth := range config.SASL {
+		switch auth := auth.(type) {
+		case *amqp.PlainAuth:
+			authCopy := *auth
+			config.SASL[i] = &authCopy
+		case *amqp.AMQPlainAuth:
+			authCopy := *auth
+			config.SASL[i] = &authCopy
+		}
+	}
+	return config
 }
 
 func (c *connectionHolder) Close() error {

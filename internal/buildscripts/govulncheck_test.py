@@ -27,8 +27,16 @@ class GovulncheckTest(unittest.TestCase):
         self.assertEqual(blocked, set())
         self.assertEqual(exempt, {"GO-2026-4887"})
 
+    def test_reviewed_client_output_helpers_are_not_applicable(self):
+        for package in govulncheck.CLIENT_HELPERS:
+            report = copy.deepcopy(self.report)
+            report[2]["finding"]["trace"][0]["package"] = package
+            blocked, exempt, _ = govulncheck.classify(report, self.imports | {package})
+            self.assertFalse(blocked)
+            self.assertEqual(exempt, {"GO-2026-4887"})
+
     def test_daemon_or_unknown_import_blocks(self):
-        for package in ("daemon", "pkg/authorization", "plugin", "new-package"):
+        for package in ("daemon", "pkg/authorization", "plugin", "pkg/unknown", "pkg/stdcopy/new", "new-package"):
             with self.subTest(package=package):
                 blocked, _, _ = govulncheck.classify(self.report, self.imports | {govulncheck.DOCKER + "/" + package})
                 self.assertEqual(blocked, {"GO-2026-4887"})
@@ -75,6 +83,26 @@ class GovulncheckTest(unittest.TestCase):
     def test_tool_failure_is_preserved(self):
         with patch("govulncheck.subprocess.run", return_value=subprocess.CompletedProcess([], 7, "scan failed")):
             self.assertEqual(govulncheck.main(["govulncheck", "./..."]), 7)
+
+    def test_mongodb_optional_gssapi_build(self):
+        report = [
+            {"config": {"scan_level": "symbol", "scan_mode": "source"}},
+            {"osv": {"id": govulncheck.GSSAPI_REPORT, "aliases": ["CVE-2026-2303"]}},
+            {"finding": {"osv": govulncheck.GSSAPI_REPORT, "trace": [{
+                "module": govulncheck.MONGO, "version": "v2.3.1",
+                "package": govulncheck.MONGO + "/mongo", "function": "Connect",
+            }]}},
+        ]
+        imports = {govulncheck.MONGO + "/x/mongo/driver/auth"}
+        self.assertEqual(govulncheck.classify(report, imports)[:2], (set(), {govulncheck.GSSAPI_REPORT}))
+        for packages in (set(), imports | {govulncheck.MONGO + "/x/mongo/driver/auth/internal/gssapi"}):
+            self.assertEqual(govulncheck.classify(report, packages)[0], {govulncheck.GSSAPI_REPORT})
+        for key, value in (("version", "v2.3.2"), ("function", "NewClient"), ("package", govulncheck.MONGO + "/other")):
+            altered = copy.deepcopy(report)
+            altered[2]["finding"]["trace"][0][key] = value
+            self.assertEqual(govulncheck.classify(altered, imports)[0], {govulncheck.GSSAPI_REPORT})
+        report[1]["osv"]["aliases"] = []
+        self.assertEqual(govulncheck.classify(report, imports)[0], {govulncheck.GSSAPI_REPORT})
 
     def test_stream_round_trip(self):
         self.assertEqual(list(govulncheck.messages("\n".join(map(json.dumps, self.report)))), self.report)
