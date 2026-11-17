@@ -36,7 +36,7 @@ jobs:
     needs: [setup-environment]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-      - run: make genotelcontribcol
+      - run: bash .github/workflows/scripts/retry-go-network.sh make genotelcontribcol
       - name: Check Collector Module Version
         run: ./.github/workflows/scripts/check-collector-module-version.sh
   lint-matrix:
@@ -129,7 +129,7 @@ jobs:
       - uses: ./.github/actions/setup-go-tools
         with:
           go-version: oldstable
-      - run: make genotelcontribcol
+      - run: bash .github/workflows/scripts/retry-go-network.sh make genotelcontribcol
       - name: CheckDoc
         run: make checkdoc
       - name: CheckMetadata
@@ -406,7 +406,7 @@ jobs:
         with:
           go-version: oldstable
           gomoddownload: "false"
-      - run: make genotelcontribcol
+      - run: bash .github/workflows/scripts/retry-go-network.sh make genotelcontribcol
       - name: Build Examples
         run: make build-examples
       - run: ./.github/workflows/scripts/check-disk-space.sh
@@ -458,7 +458,7 @@ jobs:
         with:
           go-version: oldstable
       - name: Generate collector files
-        run: make genotelcontribcol
+        run: bash .github/workflows/scripts/retry-go-network.sh make genotelcontribcol
       - name: Build Collector ${{ matrix.os }} ${{ matrix.arch }} ${{ matrix.arm }}
         run: make GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} GOARM=${{ matrix.arm }} otelcontribcol
       - name: Upload Collector Binaries
@@ -470,7 +470,7 @@ jobs:
 
   publish-check:
     runs-on: ubuntu-24.04
-    needs: [lint, unittest, integration-tests]
+    needs: [lint, unittest, integration-tests, cross-compile]
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:

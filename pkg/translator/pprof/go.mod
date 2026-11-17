@@ -1,6 +1,6 @@
 module github.com/open-telemetry/opentelemetry-collector-contrib/pkg/translator/pprof
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/google/go-cmp v0.7.0
@@ -9,7 +9,7 @@ require (
 	github.com/zeebo/xxh3 v1.1.0
 	go.opentelemetry.io/collector/pdata v1.54.1-0.20260320051400-372cc483b303
 	go.opentelemetry.io/collector/pdata/pprofile v0.148.1-0.20260320051400-372cc483b303
-	go.opentelemetry.io/otel v1.42.0
+	go.opentelemetry.io/otel v1.45.0
 )
 
 require (

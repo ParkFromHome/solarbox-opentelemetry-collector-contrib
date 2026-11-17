@@ -4,7 +4,7 @@ This optional distribution fixes Studio's direct OpenSearch ingestion without
 changing the existing ClickHouse catalog or its Collector image. It includes
 OTLP, batch/filter, OpenSearch, Basic authentication, file storage and health checks.
 
-Build from the repository root with Go 1.25 or newer and Collector Builder 0.148.0:
+Build from the repository root with Go 1.26.11 or newer and Collector Builder 0.148.0:
 
     mkdir -p dist
     ocb --config=cmd/studio-otelcol/builder-config.yaml
@@ -14,6 +14,10 @@ Build from the repository root with Go 1.25 or newer and Collector Builder 0.148
 The runtime image includes /bin/sh, CA roots, and /otelcol-contrib, and runs as
 UID/GID 1000. Queue directories must be writable by that user. Image publication
 is separate from building and testing this source.
+
+The builder manifest also pins security fixes for the upstream Collector's own
+telemetry dependencies. The local OpenSearch exporter does not import all of
+those modules, so CI scans both final Linux binaries in addition to component tests.
 
 Use mapping.mode: studio, bulk_action: index, explicit logs_index or
 traces_index, and no index time suffix. Route event/audit/LLM logs to their

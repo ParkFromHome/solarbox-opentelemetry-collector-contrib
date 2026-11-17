@@ -5,6 +5,7 @@ on:
       - exporter/opensearchexporter/**
       - cmd/studio-otelcol/**
       - .github/workflows/studio-opensearch.yml
+      - .github/workflows/scripts/retry-go-network*
   workflow_dispatch:
 permissions:
   contents: read
@@ -14,6 +15,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Check bounded download retry behavior
+        run: bash .github/workflows/scripts/retry-go-network_test.sh
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6
         with:
           go-version: 1.26.11
@@ -24,7 +27,7 @@ jobs:
       - name: Generate the optional Studio distribution
         run: |
           mkdir -p dist
-          go run go.opentelemetry.io/collector/cmd/builder@v0.148.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
+          bash .github/workflows/scripts/retry-go-network.sh go run go.opentelemetry.io/collector/cmd/builder@v0.148.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
       - name: Build Linux binaries without publishing an image
         working-directory: dist/studio-otelcol
         run: |
@@ -34,6 +37,11 @@ jobs:
           done
           cd ../../artifacts
           sha256sum studio-otelcol_linux_* > SHA256SUMS
+      - name: Scan the actual distributions, including upstream telemetry dependencies
+        run: |
+          for arch in amd64 arm64; do
+            go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -mode=binary artifacts/studio-otelcol_linux_$arch
+          done
       - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: studio-opensearch-collector

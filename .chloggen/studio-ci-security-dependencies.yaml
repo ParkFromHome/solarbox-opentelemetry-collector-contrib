@@ -1,0 +1,9 @@
+change_type: bug_fix
+component: all
+note: Update shared dependencies to patched versions and require Go 1.26 for builds.
+issues: [132]
+subtext: |
+  Update OpenTelemetry-Go, gRPC, Prometheus, compress, and golang.org/x networking,
+  cryptography, and text modules to address vulnerabilities reported by CI.
+  Existing published Collector images are not changed by this source update.
+change_logs: [user]

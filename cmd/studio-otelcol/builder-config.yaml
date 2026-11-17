@@ -22,3 +22,14 @@ providers:
   - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.54.0
 replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/exporter/opensearchexporter => ../../exporter/opensearchexporter
+  # Upstream Collector components bring their own internal telemetry SDK/exporters.
+  # Keep those patched even when they are not dependencies of our local exporter.
+  - go.opentelemetry.io/contrib/bridges/otelzap => go.opentelemetry.io/contrib/bridges/otelzap v0.20.0
+  - go.opentelemetry.io/otel/sdk/log => go.opentelemetry.io/otel/sdk/log v0.21.0
+  - go.opentelemetry.io/otel/exporters/stdout/stdoutlog => go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.21.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc => go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.21.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp => go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.21.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp => go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.45.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlptrace => go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.45.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc => go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.45.0
+  - go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp => go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.45.0

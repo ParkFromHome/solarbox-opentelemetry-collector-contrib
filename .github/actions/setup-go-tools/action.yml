@@ -43,4 +43,4 @@ runs:
       if: inputs.gomoddownload == 'true' && steps.go-setup.outputs.cache-hit != 'true'
       shell: bash
       working-directory: ${{ inputs.repo-path }}
-      run: make -j2 gomoddownload
+      run: bash .github/workflows/scripts/retry-go-network.sh make -j2 gomoddownload

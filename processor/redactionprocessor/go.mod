@@ -1,6 +1,6 @@
 module github.com/open-telemetry/opentelemetry-collector-contrib/processor/redactionprocessor
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.77.0-devel.0.20260213154712-e02b9359151a
@@ -17,10 +17,10 @@ require (
 	go.opentelemetry.io/collector/processor v1.54.1-0.20260320051400-372cc483b303
 	go.opentelemetry.io/collector/processor/processorhelper v0.148.1-0.20260320051400-372cc483b303
 	go.opentelemetry.io/collector/processor/processortest v0.148.1-0.20260320051400-372cc483b303
-	go.opentelemetry.io/otel v1.42.0
+	go.opentelemetry.io/otel v1.45.0
 	go.uber.org/goleak v1.3.0
 	go.uber.org/zap v1.27.1
-	golang.org/x/crypto v0.48.0
+	golang.org/x/crypto v0.57.0
 )
 
 require (
@@ -30,7 +30,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -57,14 +57,14 @@ require (
 	go.opentelemetry.io/collector/pdata/testdata v0.148.1-0.20260320051400-372cc483b303 // indirect
 	go.opentelemetry.io/collector/pipeline v1.54.1-0.20260320051400-372cc483b303 // indirect
 	go.opentelemetry.io/collector/processor/xprocessor v0.148.1-0.20260320051400-372cc483b303 // indirect
-	go.opentelemetry.io/otel/metric v1.42.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.42.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.42.0 // indirect
-	go.opentelemetry.io/otel/trace v1.42.0 // indirect
+	go.opentelemetry.io/otel/metric v1.45.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.45.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.45.0 // indirect
+	go.opentelemetry.io/otel/trace v1.45.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
