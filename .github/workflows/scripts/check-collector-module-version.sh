@@ -58,7 +58,14 @@ BETA_MODULE="go.opentelemetry.io/collector"
 BETA_MOD_VERSION=$(get_collector_version "$BETA_MODULE " "$MAIN_MOD_FILE")
 check_collector_versions_correct "$BETA_MODULE" "$BETA_MOD_VERSION"
 for mod in "${beta_modules[@]}"; do
-   check_collector_versions_correct "$mod" "$BETA_MOD_VERSION"
+   # Metadata belongs to this fork's v0.148 component schema. Upgrading its
+   # generator requires feature gate renames and rewrites unrelated components.
+   # Runtime modules still align below; check this build tool's explicit pin.
+   if [ "$mod" = "go.opentelemetry.io/collector/cmd/mdatagen" ]; then
+      check_collector_versions_correct "$mod" "v0.148.1-0.20260320051400-372cc483b303"
+   else
+      check_collector_versions_correct "$mod" "$BETA_MOD_VERSION"
+   fi
 done
 
 # Check stable modules, none currently exist, uncomment when pdata is 1.0.0

@@ -1,4 +1,4 @@
-# Optional Studio OpenSearch distribution. Existing ClickHouse builds are unchanged.
+# Optional Studio OpenSearch distribution. Existing published ClickHouse images are not replaced.
 dist:
   module: github.com/UpstageAI/solarbox-opentelemetry-collector-contrib/cmd/studio-otelcol
   name: studio-otelcol
@@ -6,9 +6,9 @@ dist:
   version: 0.148.0-studio.1
   output_path: ./dist/studio-otelcol
 receivers:
-  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.148.0
+  - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.153.0
 processors:
-  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.148.0
+  - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.153.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.148.0
 exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/opensearchexporter v0.148.0
@@ -17,9 +17,9 @@ extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.148.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.148.0
 providers:
-  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.54.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.54.0
-  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.54.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/envprovider v1.59.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/fileprovider v1.59.0
+  - gomod: go.opentelemetry.io/collector/confmap/provider/yamlprovider v1.59.0
 replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/exporter/opensearchexporter => ../../exporter/opensearchexporter
   # Upstream Collector components bring their own internal telemetry SDK/exporters.

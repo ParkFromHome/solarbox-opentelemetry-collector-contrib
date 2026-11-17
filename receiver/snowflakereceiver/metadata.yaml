@@ -373,6 +373,7 @@ tests:
     username: "admin"
     password: "admin"
   goleak:
+    setup: disableSnowflakeMinicoreForTests()
     ignore:
       any:
         # Regarding the godbus/dbus ignore: see https://github.com/99designs/keyring/issues/103

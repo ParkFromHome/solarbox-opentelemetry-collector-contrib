@@ -8,5 +8,8 @@ subtext: |
   Patch AWS EventStream and eBPF profiling dependencies. Replace archived hamba/avro
   with its patched iskorotkov fork for Pulsar; Collector continues to use raw
   message payloads rather than Avro schema decoding.
+  Align Collector runtime modules at v1.59.0/v0.153.0 while retaining the v0.148
+  metadata generator for existing component feature gates. Also patch Brotli,
+  RabbitMQ, PostgreSQL, Snowflake, and OpenTelemetry schema dependencies.
   Existing published Collector images are not changed by this source update.
 change_logs: [user]

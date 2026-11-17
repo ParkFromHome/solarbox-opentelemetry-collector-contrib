@@ -55,16 +55,16 @@ func CreateConfigYaml(
 
 	// Prepare extra processor config section and comma-separated list of extra processor
 	// names to use in corresponding "processors" settings.
-	processorsSections := ""
-	processorsList := ""
+	var processorsSections strings.Builder
+	var processorsList strings.Builder
 	if len(processors) > 0 {
 		first := true
 		for i := range processors {
-			processorsSections += processors[i].Body + "\n"
+			processorsSections.WriteString(processors[i].Body + "\n")
 			if !first {
-				processorsList += ","
+				processorsList.WriteString(",")
 			}
-			processorsList += processors[i].Name
+			processorsList.WriteString(processors[i].Name)
 			first = false
 		}
 	}
@@ -119,12 +119,12 @@ service:
 			format,
 			sender.GenConfigYAMLStr(),
 			receiver.GenConfigYAMLStr(),
-			processorsSections,
+			processorsSections.String(),
 			connector.GenConfigYAMLStr(),
 			telemetryPort,
 			pipeline1,
 			sender.ProtocolName(),
-			processorsList,
+			processorsList.String(),
 			connector.ProtocolName(),
 			pipeline2,
 			connector.ProtocolName(),
@@ -163,11 +163,11 @@ service:
 		format,
 		sender.GenConfigYAMLStr(),
 		receiver.GenConfigYAMLStr(),
-		processorsSections,
+		processorsSections.String(),
 		telemetryPort,
 		pipeline1,
 		sender.ProtocolName(),
-		processorsList,
+		processorsList.String(),
 		receiver.ProtocolName(),
 	)
 }

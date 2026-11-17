@@ -5,7 +5,7 @@ go 1.26.0
 require github.com/aws/aws-xray-sdk-go/v2 v2.0.0
 
 require (
-	github.com/andybalholm/brotli v1.1.0 // indirect
+	github.com/andybalholm/brotli v1.2.7 // indirect
 	github.com/klauspost/compress v1.20.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect

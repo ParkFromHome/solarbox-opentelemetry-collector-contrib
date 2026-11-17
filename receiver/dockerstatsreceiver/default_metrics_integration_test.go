@@ -50,6 +50,9 @@ func TestIntegration(t *testing.T) {
 			pmetrictest.IgnoreMetricsOrder(),
 			pmetrictest.IgnoreMetricValues(),
 			pmetrictest.IgnoreMetricDataPointsOrder(),
+			// Runner hosts expose different numbers of block devices. Compare a
+			// sorted sample here; scraper fixture tests cover all device/op pairs.
+			pmetrictest.IgnoreSubsequentDataPoints("container.blockio.io_service_bytes_recursive"),
 			pmetrictest.IgnoreResourceMetricsOrder(),
 			pmetrictest.IgnoreStartTimestamp(),
 			pmetrictest.IgnoreTimestamp()),

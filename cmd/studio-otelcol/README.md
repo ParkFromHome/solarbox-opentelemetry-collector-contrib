@@ -4,7 +4,7 @@ This optional distribution fixes Studio's direct OpenSearch ingestion without
 changing the existing ClickHouse catalog or its Collector image. It includes
 OTLP, batch/filter, OpenSearch, Basic authentication, file storage and health checks.
 
-Build from the repository root with Go 1.26.11 or newer and Collector Builder 0.148.0:
+Build from the repository root with Go 1.26.11 or newer and Collector Builder 0.153.0:
 
     mkdir -p dist
     ocb --config=cmd/studio-otelcol/builder-config.yaml

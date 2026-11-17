@@ -27,7 +27,7 @@ jobs:
       - name: Generate the optional Studio distribution
         run: |
           mkdir -p dist
-          bash .github/workflows/scripts/retry-go-network.sh go run go.opentelemetry.io/collector/cmd/builder@v0.148.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
+          bash .github/workflows/scripts/retry-go-network.sh go run go.opentelemetry.io/collector/cmd/builder@v0.153.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
       - name: Build Linux binaries without publishing an image
         working-directory: dist/studio-otelcol
         run: |

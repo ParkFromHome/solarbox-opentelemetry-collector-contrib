@@ -6,6 +6,7 @@ package snowflakereceiver
 import (
 	"database/sql"
 	"database/sql/driver"
+	"os"
 	"reflect"
 	"regexp"
 	"testing"
@@ -17,6 +18,14 @@ import (
 
 	"github.com/open-telemetry/opentelemetry-collector-contrib/receiver/snowflakereceiver/internal/metadata"
 )
+
+// These tests use SQL mocks and do not exercise the driver's native telemetry
+// library. Avoid starting its asynchronous loader, which outlives short tests.
+func disableSnowflakeMinicoreForTests() {
+	if err := os.Setenv("SF_DISABLE_MINICORE", "true"); err != nil {
+		panic(err)
+	}
+}
 
 func TestDefaultClientCreation(t *testing.T) {
 	c, err := newDefaultClient(componenttest.NewNopTelemetrySettings(), Config{

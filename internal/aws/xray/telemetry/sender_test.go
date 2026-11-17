@@ -68,6 +68,10 @@ func TestRotateRace(t *testing.T) {
 }
 
 func TestIncludeMetadata(t *testing.T) {
+	// Exercise configured metadata without inheriting a runner EC2 identity.
+	t.Setenv("AWS_EC2_METADATA_DISABLED", "true")
+	t.Setenv(envAWSHostname, "")
+	t.Setenv(envAWSInstanceID, "")
 	cfg := Config{IncludeMetadata: false}
 	awsConfig := aws.Config{}
 	set := &awsutil.AWSSessionSettings{ResourceARN: "session_arn"}
