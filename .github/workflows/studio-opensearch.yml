@@ -12,7 +12,7 @@ permissions:
 jobs:
   test-and-build:
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Check bounded download retry behavior
@@ -42,6 +42,20 @@ jobs:
           for arch in amd64 arm64; do
             go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -mode=binary artifacts/studio-otelcol_linux_$arch
           done
+      - name: Build and verify the runtime image without publishing
+        run: |
+          docker build -f cmd/studio-otelcol/Dockerfile -t studio-opensearch-ci .
+          docker run --rm studio-opensearch-ci --version
+          docker run --rm --entrypoint /bin/sh studio-opensearch-ci -ec '
+            test "$(id -u)" != 0
+            test -s /etc/ssl/cert.pem
+            test -w /var/lib/otelcol
+          '
+          container=$(docker create studio-opensearch-ci)
+          image_binary=$(mktemp)
+          trap 'docker rm "$container" >/dev/null; rm -f "$image_binary"' EXIT
+          docker cp "$container:/otelcol-contrib" "$image_binary"
+          go run golang.org/x/vuln/cmd/govulncheck@v1.1.4 -mode=binary "$image_binary"
       - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: studio-opensearch-collector

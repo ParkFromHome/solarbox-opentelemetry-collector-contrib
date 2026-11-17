@@ -3,7 +3,7 @@ FROM golang:1.26.11 AS build
 WORKDIR /src
 COPY exporter/opensearchexporter ./exporter/opensearchexporter
 COPY cmd/studio-otelcol/builder-config.yaml ./cmd/studio-otelcol/builder-config.yaml
-RUN mkdir -p dist && go run go.opentelemetry.io/collector/cmd/builder@v0.148.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
+RUN mkdir -p dist && go run go.opentelemetry.io/collector/cmd/builder@v0.153.0 --config=cmd/studio-otelcol/builder-config.yaml --skip-compilation
 ARG TARGETOS=linux
 ARG TARGETARCH=amd64
 RUN cd dist/studio-otelcol && CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -o /studio-otelcol .

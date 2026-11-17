@@ -25,13 +25,23 @@ import (
 
 func TestStudioExporterRetriesWholeBulkFailures(t *testing.T) {
 	for _, signal := range []string{"logs", "traces"} {
-		for _, status := range []int{500, 429, 403} {
+		for _, status := range []int{0, 500, 429, 403} {
 			t.Run(fmt.Sprintf("%s/%d", signal, status), func(t *testing.T) {
 				var requests atomic.Int32
 				var mu sync.Mutex
 				var ids []string
 				server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					if requests.Add(1) == 1 {
+						if status == 0 {
+							// Simulate a connection lost before any HTTP response.
+							connection, _, err := w.(http.Hijacker).Hijack()
+							if err != nil {
+								t.Error(err)
+								return
+							}
+							_ = connection.Close()
+							return
+						}
 						w.Header().Set("Content-Type", "application/json")
 						w.WriteHeader(status)
 						_ = json.NewEncoder(w).Encode(map[string]any{"status": status, "error": map[string]any{"type": "synthetic", "reason": "failure"}})
